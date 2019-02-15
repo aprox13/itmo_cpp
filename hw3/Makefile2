@@ -1,0 +1,34 @@
+CXX := g++
+
+OUTPUTDIR = debug
+SOURCES := $(OUTPUTDIR)/bye.o $(OUTPUTDIR)/hello.o $(OUTPUTDIR)/here.o 
+LIBNAME := dynamiclib.so
+MAJOR := 5
+MINOR := 1
+RELEASE := 10
+FULLNAMEVERSION := $(LIBNAME).$(MAJOR).$(MINOR).$(RELEASE)
+
+all: $(OUTPUTDIR)/main simpleclean
+
+$(OUTPUTDIR)/main: $(OUTPUTDIR)/main.o $(OUTPUTDIR)/$(FULLNAMEVERSION) | $(OUTPUTDIR)
+	$(CXX) -o $@ $^
+
+$(OUTPUTDIR)/%.o: %.cpp myLib.h | $(OUTPUTDIR)
+	$(CXX) -c -o $@ $<
+
+$(OUTPUTDIR)/$(FULLNAMEVERSION): $(SOURCES) | $(OUTPUTDIR)
+	$(CXX) -shared -Wl,-soname,$(LIBNAME).$(MAJOR) -o $@ $^
+	ln -sf $(FULLNAMEVERSION) $(OUTPUTDIR)/$(LIBNAME)
+	ln -sf $(FULLNAMEVERSION) $(OUTPUTDIR)/$(LIBNAME).$(MAJOR)
+
+$(OUTPUTDIR):
+	mkdir -p $(OUTPUTDIR)
+
+.PHONY: clean
+
+clean:
+	rm -rf $(OUTPUTDIR)
+	
+simpleclean:
+	rm -rf $(OUTPUTDIR)/*.o 
+	

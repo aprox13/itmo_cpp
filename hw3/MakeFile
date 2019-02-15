@@ -1,0 +1,26 @@
+CXX := g++
+
+OUTPUTDIR := debug
+SOURCES := $(OUTPUTDIR)/bye.o $(OUTPUTDIR)/hello.o $(OUTPUTDIR)/here.o 
+
+all: $(OUTPUTDIR)/main simpleclean
+
+$(OUTPUTDIR)/main: $(OUTPUTDIR)/main.o $(OUTPUTDIR)/myLib.a | $(OUTPUTDIR)
+	$(CXX) -o $@ $^
+
+$(OUTPUTDIR)/%.o: %.cpp myLib.h | $(OUTPUTDIR)
+	$(CXX) -c -o $@ $<
+
+$(OUTPUTDIR)/myLib.a: $(SOURCES) | $(OUTPUTDIR)
+	ar cr $@ $^
+
+$(OUTPUTDIR):
+	mkdir -p $(OUTPUTDIR)
+
+.PHONY: clean simpleclean
+
+clean:
+	rm -rf $(OUTPUTDIR)
+	
+simpleclean:
+	rm -rf $(OUTPUTDIR)/*.o 
